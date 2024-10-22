@@ -8,10 +8,17 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum UserType {
+  ADMIN
+  VENDOR
+  CUSTOMER
+}
+
 model Roles {
   id          String   @id @default(uuid())
   name        String   @db.VarChar(20)
   description String?  @db.VarChar(100)
+  type        UserType
 
   users User_basic[]
 }
@@ -118,4 +125,3 @@ model Characteristics {
 
   store     Store     @relation(fields: [storeId], references: [id])
 }
-
