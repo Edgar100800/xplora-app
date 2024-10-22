@@ -1,71 +1,121 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-model User {
-  id         String   @id 
-  email      String   @unique
-  full_name  String?
-  avatar_url String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  media      Media[]
+model Roles {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(20)
+  description String?  @db.VarChar(100)
 
-  vendor     Vendor?
-  client     Client?
-  userType   UserType
+  users User_basic[]
 }
 
-model Vendor {
-  id          String @id @default(cuid())
-  user        User   @relation(fields: [userId], references: [id])
-  userId      String @unique
-  companyName String
-  license     String
+model User_basic {
+  id         String    @id @default(uuid())
+  roleId     String
+  email      String    @unique @db.VarChar(150)
+  fullName   String    @db.VarChar(150)
+  avatarUrl  String?   @db.VarChar(255)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
+
+  role      Roles     @relation(fields: [roleId], references: [id])
+  customer  Customers?
+  vendor    Vendors?
 }
 
-model Client {
-  id                    String @id @default(cuid())
-  user                  User   @relation(fields: [userId], references: [id])
-  userId                String @unique
-  preferredContactMethod String
-  loyaltyPoints         Int    @default(0)
+model Customers {
+  // id          String   @id @default(uuid())
+  userId      String   @unique
+  paymentMethod String @db.VarChar(50)
+  address     String   @db.VarChar(255)
+
+  user      User_basic @relation(fields: [userId], references: [id])
+  reviews   Review[]
 }
 
-enum UserType {
-  VENDOR
-  CLIENT
-}
-model Media {   
-  id         String   @id @default(uuid())
-  user_id    String   
-  user       User     @relation(fields: [user_id], references: [id])
-  name       String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  images     Image[]
+model Vendors {
+  // id        String    @id @default(uuid())
+  userId    String    @unique
+  storeId   String    @unique
+  description String? @db.Text
+
+  user      User_basic @relation(fields: [userId], references: [id])
+  store     Store     @relation(fields: [storeId], references: [id])
 }
 
-model Image {
-  id         String   @id  @default(uuid())
-  media      Media    @relation(fields: [media_id], references: [id],onDelete: Cascade)
-  media_id   String   
-  title      String?
-  description String?
-  url        String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+model Store {
+  id             String           @id @default(uuid())
+  name           String           @db.VarChar(150)
+  description    String?          @db.Text
+  images         Images[]
+  characteristics Characteristics[]
+  address        String           @db.VarChar(255)
+  location       String           @db.VarChar(255)
+  number         String?          @db.VarChar(20)
+  attentionHours String?          @db.VarChar(100)
+  categoryId     String
+  rating         Float?
+
+  category   Category          @relation(fields: [categoryId], references: [id])
+  reviews    Review[]
+  vendor     Vendors?
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @db.VarChar(150)
+  description String?   @db.Text
+  createdAt   DateTime  @default(now())
+
+  stores      Store[]
+}
+
+model Images {
+  id        String    @id @default(uuid())
+  storeId   String
+  imgUrl    String    @db.VarChar(255)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  store     Store     @relation(fields: [storeId], references: [id])
+}
+
+model Review {
+  id                 String   @id @default(uuid())
+  customerId         String
+  storeId            String
+  stars              Int      @db.SmallInt
+  comment            String?  @db.Text
+  reviewCharacteristicsId String?
+
+  customer           Customers @relation(fields: [customerId], references: [userId])
+  store              Store     @relation(fields: [storeId], references: [id])
+  reviewCharacteristics ReviewCharacteristics? @relation(fields: [reviewCharacteristicsId], references: [id])
+}
+
+model ReviewCharacteristics {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(150)
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  reviews     Review[]
+}
+
+model Characteristics {
+  id          String   @id @default(uuid())
+  storeId     String
+  name        String   @db.VarChar(150)
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  store     Store     @relation(fields: [storeId], references: [id])
 }
 
