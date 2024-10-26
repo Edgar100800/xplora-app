@@ -2,8 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { UserType } from "@prisma/client";
 
 import { createClient } from "@/utils/supabase/server";
+import { PrismaClient } from "@prisma/client";
+
 
 export async function login(formData: FormData) {
   const supabase = createClient();
@@ -27,7 +30,7 @@ export async function login(formData: FormData) {
 
 export async function signup(formData: FormData) {
   const supabase = createClient();
-
+  const prisma = new PrismaClient();
   // type-casting here for convenience
   // in practice, you should validate your inputs
   const firstName = formData.get("first-name") as string;
@@ -48,31 +51,43 @@ export async function signup(formData: FormData) {
   if (error) {
     redirect("/error");
   } else if (userData.user) {
-    const response = await fetch(`/api/users`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        id: userData.user.id,
-        full_name: `${firstName + " " + lastName}`, 
-        email: formData.get("email") as string, 
-        // avatar_url: userData.user?.user_metadata?.avatar_url,
-        // password: formData.get("password") as string,
-      }),
-    })
+    try {
+      const customerRole = await prisma.role.findUnique({ where: { type: UserType.CUSTOMER } })
+      if (!customerRole) {
+        throw new Error('Customer role not found')
+      }
+      console.log('Customer role found in database:', customerRole)
+      const userBasic = await prisma.userBasic.create({
+        data: {
+          id: userData.user.id,
+          role_id: customerRole.id,
+          email: formData.get("email") as string,
+          full_name: `${firstName} ${lastName}`,
+          // avatar_url: userData.user?.user_metadata?.avatar_url,
+        },
+      })
+      console.log('UserBasic created in database:', userBasic)
 
-    if (response.ok) {
-      console.log('User created in database')
-      // router.push('/dashboard')
-    } else {
-      console.error('Failed to create user in database')
-      // setError('Failed to create user in database')
+      const customer = await prisma.customer.create({
+        data: {
+          user_id: userBasic.id,
+          payment_method: "Cash",
+          address: "123 Main St, Anytown, USA",
+        },
+      })
+      console.log('Customer created in database:', customer)
+
+      console.log('User created in database:', userBasic)
+    } catch (prismaError) {
+      console.error('Failed to create user in database:', prismaError)
+      redirect("/error")
+    } finally {
+      await prisma.$disconnect()
     }
   }
 
   revalidatePath("/", "layout");
-  redirect("/dashboard");
+  redirect("/");
 }
 
 export async function signout() {
