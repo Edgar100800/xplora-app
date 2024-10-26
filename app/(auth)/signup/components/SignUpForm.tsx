@@ -30,7 +30,7 @@ export function SignUpForm() {
                 <Input
                   name="first-name"
                   id="first-name"
-                  placeholder="Max"
+                  placeholder="Alejandro"
                   required
                 />
               </div>
@@ -39,7 +39,7 @@ export function SignUpForm() {
                 <Input
                   name="last-name"
                   id="last-name"
-                  placeholder="Robinson"
+                  placeholder="Perez"
                   required
                 />
               </div>
@@ -50,23 +50,23 @@ export function SignUpForm() {
                 name="email"
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="email@example.com"
                 required
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Contraseña</Label>
               <Input name="password" id="password" type="password" />
             </div>
             <Button formAction={signup} type="submit" className="w-full">
-              Create an account
+              Crear Cuenta
             </Button>
           </div>
         </form>
         <div className="mt-4 text-center text-sm">
-          Already have an account?{" "}
+          ¿Ya tienes una cuenta?{" "}
           <Link href="/login" className="underline">
-            Sign in
+            Inicia Sesión
           </Link>
         </div>
       </CardContent>
