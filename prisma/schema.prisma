@@ -14,114 +14,112 @@ enum UserType {
   CUSTOMER
 }
 
-model Roles {
+model Role {
   id          String   @id @default(uuid())
-  name        String   @db.VarChar(20)
+  name        String   @db.VarChar(20) @unique
   description String?  @db.VarChar(100)
-  type        UserType
+  type        UserType @default(CUSTOMER)
 
-  users User_basic[]
+  users UserBasic[]
 }
 
-model User_basic {
-  id         String    @id @default(uuid())
-  roleId     String
-  email      String    @unique @db.VarChar(150)
-  fullName   String    @db.VarChar(150)
-  avatarUrl  String?   @db.VarChar(255)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime? @updatedAt
+model UserBasic {
+  id          String    @id @default(uuid())
+  role_id     String
+  email       String    @unique @db.VarChar(150)
+  full_name   String    @db.VarChar(150)
+  avatar_url  String?   @db.VarChar(255)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
 
-  role      Roles     @relation(fields: [roleId], references: [id])
-  customer  Customers?
-  vendor    Vendors?
+  role        Role      @relation(fields: [role_id], references: [id])
+  customer    Customer?
+  vendor      Vendor?
 }
 
-model Customers {
-  // id          String   @id @default(uuid())
-  userId      String   @unique
-  paymentMethod String @db.VarChar(50)
-  address     String   @db.VarChar(255)
+model Customer {
+  user_id       String   @unique
+  payment_method String  @db.VarChar(50)
+  address       String   @db.VarChar(255)
 
-  user      User_basic @relation(fields: [userId], references: [id])
-  reviews   Review[]
+  user          UserBasic @relation(fields: [user_id], references: [id])
+  reviews       Review[]
 }
 
-model Vendors {
-  // id        String    @id @default(uuid())
-  userId    String    @unique
-  storeId   String    @unique
-  description String? @db.Text
+model Vendor {
+  user_id     String    @unique
+  store_id    String    @unique
+  description String?  @db.Text
 
-  user      User_basic @relation(fields: [userId], references: [id])
-  store     Store     @relation(fields: [storeId], references: [id])
+  user        UserBasic @relation(fields: [user_id], references: [id])
+  store       Store     @relation(fields: [store_id], references: [id])
 }
 
 model Store {
-  id             String           @id @default(uuid())
-  name           String           @db.VarChar(150)
-  description    String?          @db.Text
-  images         Images[]
-  characteristics Characteristics[]
-  address        String           @db.VarChar(255)
-  location       String           @db.VarChar(255)
-  number         String?          @db.VarChar(20)
-  attentionHours String?          @db.VarChar(100)
-  categoryId     String
-  rating         Float?
+  id                String           @id @default(uuid())
+  name              String           @db.VarChar(150)
+  description       String?          @db.Text
+  images            Image[]
+  characteristics   Characteristic[]
+  address           String           @db.VarChar(255)
+  location          String           @db.VarChar(255)
+  number            String?          @db.VarChar(20)
+  attention_hours   String?          @db.VarChar(100)
+  category_id       String
+  rating            Float?
 
-  category   Category          @relation(fields: [categoryId], references: [id])
-  reviews    Review[]
-  vendor     Vendors?
+  category          Category         @relation(fields: [category_id], references: [id])
+  reviews           Review[]
+  vendor            Vendor?
 }
 
 model Category {
   id          String    @id @default(uuid())
   name        String    @db.VarChar(150)
   description String?   @db.Text
-  createdAt   DateTime  @default(now())
+  created_at  DateTime  @default(now())
 
   stores      Store[]
 }
 
-model Images {
-  id        String    @id @default(uuid())
-  storeId   String
-  imgUrl    String    @db.VarChar(255)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
+model Image {
+  id          String    @id @default(uuid())
+  store_id    String
+  img_url     String    @db.VarChar(255)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
 
-  store     Store     @relation(fields: [storeId], references: [id])
+  store       Store     @relation(fields: [store_id], references: [id])
 }
 
 model Review {
-  id                 String   @id @default(uuid())
-  customerId         String
-  storeId            String
-  stars              Int      @db.SmallInt
-  comment            String?  @db.Text
-  reviewCharacteristicsId String?
+  id                        String   @id @default(uuid())
+  customer_id               String
+  store_id                  String
+  stars                     Int      @db.SmallInt
+  comment                   String?  @db.Text
+  review_characteristics_id String?
 
-  customer           Customers @relation(fields: [customerId], references: [userId])
-  store              Store     @relation(fields: [storeId], references: [id])
-  reviewCharacteristics ReviewCharacteristics? @relation(fields: [reviewCharacteristicsId], references: [id])
+  customer                  Customer @relation(fields: [customer_id], references: [user_id])
+  store                     Store    @relation(fields: [store_id], references: [id])
+  review_characteristics    ReviewCharacteristic? @relation(fields: [review_characteristics_id], references: [id])
 }
 
-model ReviewCharacteristics {
+model ReviewCharacteristic {
   id          String   @id @default(uuid())
   name        String   @db.VarChar(150)
   description String?  @db.Text
-  createdAt   DateTime @default(now())
+  created_at  DateTime @default(now())
 
   reviews     Review[]
 }
 
-model Characteristics {
+model Characteristic {
   id          String   @id @default(uuid())
-  storeId     String
+  store_id    String
   name        String   @db.VarChar(150)
   description String?  @db.Text
-  createdAt   DateTime @default(now())
+  created_at  DateTime @default(now())
 
-  store     Store     @relation(fields: [storeId], references: [id])
+  store       Store    @relation(fields: [store_id], references: [id])
 }

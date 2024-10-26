@@ -1,63 +1,48 @@
-// import { PrismaClient, UserType } from '@prisma/client'
+const { PrismaClient, UserType } = require('@prisma/client')
 
-// const prisma = new PrismaClient()
+const prisma = new PrismaClient()
 
-// async function main() {
-//   // Create roles
-//   const adminRole = await prisma.role.upsert({
-//     where: { name: 'Admin' },
-//     update: {},
-//     create: { name: 'Admin', description: 'Administrator role' },
-//   })
+async function main() {
+  // Create roles
+  const adminRole = await prisma.role.create({
+    data: { name: 'Admin', description: 'Administrator role', type: UserType.ADMIN },
+  })
 
-//   const vendorRole = await prisma.role.upsert({
-//     where: { name: 'Vendor' },
-//     update: {},
-//     create: { name: 'Vendor', description: 'Vendor role' },
-//   })
+  const vendorRole = await prisma.role.create({
+    data: { name: 'Vendor', description: 'Vendor role', type: UserType.VENDOR },
+  })
 
-//   const customerRole = await prisma.role.upsert({
-//     where: { name: 'Customer' },
-//     update: {},
-//     create: { name: 'Customer', description: 'Customer role' },
-//   })
+  const customerRole = await prisma.role.create({
+    data: { name: 'Customer', description: 'Customer role', type: UserType.CUSTOMER },
+  })
 
-//   // Create users
-//   const admin = await prisma.admin.upsert({
-//     where: { email: 'admin@example.com' },
-//     update: {},
-//     create: { name: 'Admin User', email: 'admin@example.com' },
-//   })
+  // Create users
+  const admin = await prisma.userBasic.upsert({
+    where: { email: 'admin@example.com' },
+    update: {},
+    create: { full_name: 'Admin User', email: 'admin@example.com', role_id: adminRole.id },
+  })
 
-//   const vendor = await prisma.vendor.upsert({
-//     where: { email: 'vendor@example.com' },
-//     update: {},
-//     create: { name: 'Vendor User', email: 'vendor@example.com' },
-//   })
+  const vendor = await prisma.userBasic.upsert({
+    where: { email: 'vendor@example.com' },
+    update: {},
+    create: { full_name: 'Vendor User', email: 'vendor@example.com', role_id: vendorRole.id },
+  })
 
-//   const customer = await prisma.customer.upsert({
-//     where: { email: 'customer@example.com' },
-//     update: {},
-//     create: { name: 'Customer User', email: 'customer@example.com' },
-//   })
+  const customer = await prisma.userBasic.upsert({
+    where: { email: 'customer@example.com' },
+    update: {},
+    create: { full_name: 'Customer User', email: 'customer@example.com', role_id: customerRole.id },
+  })
 
-//   // Assign roles to users
-//   await prisma.userRole.createMany({
-//     data: [
-//       { roleId: adminRole.id, targetId: admin.id, targetType: UserType.ADMIN },
-//       { roleId: vendorRole.id, targetId: vendor.id, targetType: UserType.VENDOR },
-//       { roleId: customerRole.id, targetId: customer.id, targetType: UserType.CUSTOMER },
-//     ],
-//   })
+  console.log('Seed data created successfully')
+}
 
-//   console.log('Seed data created successfully')
-// }
-
-// main()
-//   .catch((e) => {
-//     console.error(e)
-//     process.exit(1)
-//   })
-//   .finally(async () => {
-//     await prisma.$disconnect()
-//   })
+main()
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })
