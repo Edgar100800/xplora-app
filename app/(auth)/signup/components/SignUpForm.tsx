@@ -16,9 +16,9 @@ export function SignUpForm() {
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-xl">Sign Up</CardTitle>
+        <CardTitle className="text-xl">Registrate</CardTitle>
         <CardDescription>
-          Enter your information to create an account
+          Create an account to access all the features of
         </CardDescription>
       </CardHeader>
       <CardContent>
