@@ -6,7 +6,7 @@ CREATE TABLE "Role" (
     "id" TEXT NOT NULL,
     "name" VARCHAR(20) NOT NULL,
     "description" VARCHAR(100),
-    "type" "UserType" NOT NULL,
+    "type" "UserType" NOT NULL DEFAULT 'CUSTOMER',
 
     CONSTRAINT "Role_pkey" PRIMARY KEY ("id")
 );
@@ -106,6 +106,9 @@ CREATE TABLE "Characteristic" (
 
     CONSTRAINT "Characteristic_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Role_name_key" ON "Role"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "UserBasic_email_key" ON "UserBasic"("email");

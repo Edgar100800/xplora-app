@@ -15,10 +15,10 @@ enum UserType {
 }
 
 model Role {
-  id          String   @id @default(uuid())
+  id          String   @id @default(uuid()) @map("id")
   name        String   @db.VarChar(20) @unique
   description String?  @db.VarChar(100)
-  type        UserType @default(CUSTOMER)
+  type        UserType @unique
 
   users UserBasic[]
 }
@@ -38,16 +38,16 @@ model UserBasic {
 }
 
 model Customer {
-  user_id       String   @unique
-  payment_method String  @db.VarChar(50)
-  address       String   @db.VarChar(255)
+  user_id       String   @id @unique
+  payment_method String?  @db.VarChar(50)
+  address       String?   @db.VarChar(255)
 
   user          UserBasic @relation(fields: [user_id], references: [id])
   reviews       Review[]
 }
 
 model Vendor {
-  user_id     String    @unique
+  user_id     String    @id @unique
   store_id    String    @unique
   description String?  @db.Text
 
