@@ -18,7 +18,7 @@ export function SignUpForm() {
       <CardHeader>
         <CardTitle className="text-xl">Registrate</CardTitle>
         <CardDescription>
-          Create an account to access all the features of
+          Primero, crea una cuenta gratuita en Xplora para comenzar
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -26,7 +26,7 @@ export function SignUpForm() {
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="first-name">First name</Label>
+                <Label htmlFor="first-name">Nombre</Label>
                 <Input
                   name="first-name"
                   id="first-name"
@@ -35,7 +35,7 @@ export function SignUpForm() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="last-name">Last name</Label>
+                <Label htmlFor="last-name">Apellido</Label>
                 <Input
                   name="last-name"
                   id="last-name"
@@ -45,7 +45,7 @@ export function SignUpForm() {
               </div>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Correo</Label>
               <Input
                 name="email"
                 id="email"
